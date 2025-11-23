@@ -1,0 +1,44 @@
+/* Coffee Express - Menu styles */
+:root{--coffee:#5C4033;--cream:#F5EBDD;--gold:#C6A664;--white:#FFFFFF;--ink:#2b1f19;--gray:#7b6e66;--radius:14px;--transition:all .3s ease}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Poppins',system-ui,Arial,sans-serif;background:var(--cream);color:var(--ink);line-height:1.6}
+img{max-width:100%;display:block}
+a{text-decoration:none;color:inherit}
+.container{max-width:1200px;margin:0 auto;padding:0 20px}
+.navbar{position:sticky;top:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:16px 7%;background:rgba(255,255,255,.85);backdrop-filter:blur(8px);border-bottom:1px solid rgba(0,0,0,.06)}
+.Logo{font-weight:700;color:var(--coffee)}
+.navbar .nav ul{list-style:none;display:flex;gap:18px}
+.navbar .nav a{font-weight:600;color:var(--ink);position:relative}
+.navbar .nav a:after{content:"";position:absolute;left:0;bottom:-4px;height:2px;background:var(--gold);width:0;transition:var(--transition)}
+.navbar .nav a:hover:after{width:100%}
+
+.hero-menu{position:relative;min-height:56vh;display:grid;place-items:center;background:url('../images/benner1.png') center/cover no-repeat}
+.hero-menu::before{content:"";position:absolute;inset:0;background:rgba(0,0,0,.35)}
+.hero-menu .hero-content{position:relative;color:#fff;text-align:center;padding:80px 20px}
+.hero-buttons .btn{margin:6px}
+
+.btn{display:inline-block;padding:12px 22px;border-radius:10px;font-weight:700;transition:var(--transition);border:2px solid transparent}
+.btn-primary{background:var(--coffee);color:#fff}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.btn-secondary{background:transparent;border-color:#fff;color:#fff}
+.btn-secondary:hover{background:#fff;color:var(--coffee)}
+
+.section-header{text-align:center;margin-bottom:34px}
+.section-header h2{font-size:clamp(1.6rem,1.2rem+1.2vw,2.2rem)}
+.section-header p{color:var(--gray)}
+
+/* Grids */
+.menu.container,.coffee.container{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px}
+.menu-item,.coffee-item{background:#fff;border-radius:var(--radius);box-shadow:0 4px 16px rgba(0,0,0,.08);padding:16px;transition:var(--transition);text-align:center}
+.menu-item:hover,.coffee-item:hover{transform:translateY(-6px);box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.item-media{position:relative;border-radius:12px;overflow:hidden}
+.item-media img{height:220px;width:100%;object-fit:cover;transition:transform .5s ease}
+.item-media .item-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.55),rgba(0,0,0,.15));display:flex;align-items:flex-end;justify-content:center;padding:14px;opacity:0;transition:var(--transition)}
+.menu-item:hover .item-media img,.coffee-item:hover .item-media img{transform:scale(1.06)}
+.menu-item:hover .item-overlay,.coffee-item:hover .item-overlay{opacity:1}
+.item-overlay p{color:#fff;margin-bottom:8px}
+
+footer.site-footer{background:#fff;border-top:1px solid rgba(0,0,0,.06);padding:28px 0}
+.footer-inner{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand{font-weight:800;color:var(--coffee)}
+
