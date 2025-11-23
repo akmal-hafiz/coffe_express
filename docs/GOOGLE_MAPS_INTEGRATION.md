@@ -309,11 +309,6 @@ WHERE pickup_option = 'delivery';
 
 ## 🔑 API KEY SETUP
 
-### Current API Key:
-```
-AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8
-```
-
 ### Getting Your Own API Key:
 
 1. **Go to Google Cloud Console**

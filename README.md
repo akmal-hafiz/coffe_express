@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Coffee Express ☕
 
 Aplikasi web untuk manajemen pesanan kopi dengan fitur real-time tracking, admin dashboard, dan integrasi Google Maps.
@@ -76,3 +77,7 @@ Lihat folder `docs/` untuk dokumentasi lengkap:
 ## License
 
 MIT License
+=======
+# coffe_express
+Coffee Express - Laravel 12 App
+>>>>>>> 886b939cedbccda21463f9c469b585f117c49c30
