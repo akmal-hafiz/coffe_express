@@ -114,11 +114,17 @@
   <nav class="bg-white/80 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b-2 border-coffee-200">
     <div class="container mx-auto px-4 py-4">
       <div class="flex items-center justify-between">
-        <!-- Logo with Coffee Icon -->
-        <a href="{{ route('home') }}" class="flex items-center gap-2 text-2xl font-bold text-coffee-700 hover:text-coffee-900 transition-colors">
-          <i data-feather="coffee" class="w-8 h-8"></i>
-          <span>Coffee Express</span>
-        </a>
+        <div class="flex items-center gap-2">
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg hover:bg-coffee-50 transition-colors text-coffee-700">
+                <i data-feather="menu" class="w-6 h-6"></i>
+            </button>
+            <!-- Logo with Coffee Icon -->
+            <a href="{{ route('home') }}" class="flex items-center gap-2 text-2xl font-bold text-coffee-700 hover:text-coffee-900 transition-colors">
+                <i data-feather="coffee" class="w-8 h-8"></i>
+                <span>Coffee Express</span>
+            </a>
+        </div>
         
         <!-- Nav Links -->
         <div class="hidden md:flex items-center gap-6">
@@ -142,6 +148,121 @@
       </div>
     </div>
   </nav>
+
+<!-- Mobile Menu Overlay -->
+<div id="mobile-menu" class="fixed inset-0 z-50 hidden">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity opacity-0" id="mobile-menu-backdrop"></div>
+  
+  <!-- Menu Panel -->
+  <div class="absolute right-0 top-0 h-full w-[280px] bg-white shadow-2xl transform translate-x-full transition-transform duration-300 ease-out flex flex-col" id="mobile-menu-panel">
+    <!-- Header -->
+    <div class="p-5 border-b border-gray-100 flex items-center justify-between bg-coffee/5">
+      <div class="flex items-center gap-2 text-coffee font-bold">
+        <i data-feather="coffee" class="w-5 h-5"></i>
+        <span>Menu</span>
+      </div>
+      <button id="close-mobile-menu" class="p-2 hover:bg-white rounded-full transition-colors shadow-sm">
+        <i data-feather="x" class="w-5 h-5 text-gray-500"></i>
+      </button>
+    </div>
+    
+    <!-- Links -->
+    <div class="flex-1 overflow-y-auto py-4">
+      <nav class="flex flex-col px-4 gap-2">
+        <a href="{{ url('/') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-coffee/5 hover:text-coffee rounded-xl transition-all font-medium">
+          <i data-feather="home" class="w-5 h-5"></i> Home
+        </a>
+        <a href="{{ url('menu') }}" class="flex items-center gap-3 px-4 py-3 bg-coffee text-white rounded-xl shadow-md transition-all font-medium">
+          <i data-feather="coffee" class="w-5 h-5"></i> Menu
+        </a>
+        <a href="{{ route('reviews.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-coffee/5 hover:text-coffee rounded-xl transition-all font-medium">
+          <i data-feather="star" class="w-5 h-5"></i> Reviews
+        </a>
+        <a href="{{ url('contact') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-coffee/5 hover:text-coffee rounded-xl transition-all font-medium">
+          <i data-feather="mail" class="w-5 h-5"></i> Contact
+        </a>
+        
+        <div class="my-2 border-t border-gray-100"></div>
+        
+        @auth
+          <a href="{{ route('order.status') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-coffee/5 hover:text-coffee rounded-xl transition-all font-medium">
+            <i data-feather="package" class="w-5 h-5"></i> My Orders
+          </a>
+          <a href="{{ route('loyalty.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-coffee/5 hover:text-coffee rounded-xl transition-all font-medium">
+            <i data-feather="gift" class="w-5 h-5"></i> Loyalty Program
+          </a>
+          <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-coffee/5 hover:text-coffee rounded-xl transition-all font-medium">
+            <i data-feather="user" class="w-5 h-5"></i> Profile
+          </a>
+          <form method="POST" action="{{ route('logout') }}" class="mt-2">
+            @csrf
+            <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-all font-medium">
+              <i data-feather="log-out" class="w-5 h-5"></i> Logout
+            </button>
+          </form>
+        @else
+          <a href="{{ route('login') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-coffee/5 hover:text-coffee rounded-xl transition-all font-medium">
+            <i data-feather="log-in" class="w-5 h-5"></i> Login
+          </a>
+          <a href="{{ route('register') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-coffee/5 hover:text-coffee rounded-xl transition-all font-medium">
+            <i data-feather="user-plus" class="w-5 h-5"></i> Register
+          </a>
+        @endauth
+      </nav>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Navigation Bar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40 safe-area-bottom">
+  <div class="flex items-center justify-around px-2 py-3">
+    <!-- Home -->
+    <a href="{{ url('/') }}" class="flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors text-gray-600 hover:text-coffee">
+      <i data-feather="home" class="w-5 h-5"></i>
+      <span class="text-xs font-medium">Home</span>
+    </a>
+
+    <!-- Menu -->
+    <a href="{{ url('menu') }}" class="flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors text-coffee">
+      <i data-feather="coffee" class="w-5 h-5"></i>
+      <span class="text-xs font-medium">Menu</span>
+    </a>
+
+    <!-- Cart (Center - Elevated) -->
+    <button id="cart-icon-bottom" class="relative -mt-6 flex flex-col items-center gap-1 px-4 py-3 bg-coffee text-white rounded-2xl shadow-lg transition-transform hover:scale-105">
+      <i data-feather="shopping-cart" class="w-6 h-6"></i>
+      <span class="text-xs font-semibold">Cart</span>
+      <span id="cart-count-bottom" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center" style="display: none;">0</span>
+    </button>
+
+    @auth
+      <!-- Orders -->
+      <a href="{{ route('order.status') }}" class="flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors {{ request()->is('order-status') ? 'text-coffee' : 'text-gray-600 hover:text-coffee' }}">
+        <i data-feather="package" class="w-5 h-5"></i>
+        <span class="text-xs font-medium">Orders</span>
+      </a>
+
+      <!-- Profile -->
+      <a href="{{ route('profile.edit') }}" class="flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors {{ request()->is('profile*') ? 'text-coffee' : 'text-gray-600 hover:text-coffee' }}">
+        <i data-feather="user" class="w-5 h-5"></i>
+        <span class="text-xs font-medium">Profile</span>
+      </a>
+    @else
+      <!-- Login -->
+      <a href="{{ route('login') }}" class="flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors text-gray-600 hover:text-coffee">
+        <i data-feather="log-in" class="w-5 h-5"></i>
+        <span class="text-xs font-medium">Login</span>
+      </a>
+
+      <!-- Register -->
+      <a href="{{ route('register') }}" class="flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors text-gray-600 hover:text-coffee">
+        <i data-feather="user-plus" class="w-5 h-5"></i>
+        <span class="text-xs font-medium">Register</span>
+      </a>
+    @endauth
+  </div>
+</nav>
 
   <!-- ☕ Main Content -->
   <main class="container mx-auto px-4 py-8">
@@ -360,6 +481,42 @@
     @endif
     
   </main>
+
+  <!-- Spacer for bottom nav on mobile -->
+<div class="md:hidden h-24"></div>
+
+<script>
+  // Mobile Menu Logic
+  const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const closeMobileMenuBtn = document.getElementById('close-mobile-menu');
+  const mobileMenuBackdrop = document.getElementById('mobile-menu-backdrop');
+  const mobileMenuPanel = document.getElementById('mobile-menu-panel');
+
+  function openMobileMenu() {
+    mobileMenu.classList.remove('hidden');
+    // Trigger reflow
+    void mobileMenu.offsetWidth;
+    mobileMenuBackdrop.classList.remove('opacity-0');
+    mobileMenuPanel.classList.remove('translate-x-full');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMobileMenu() {
+    mobileMenuBackdrop.classList.add('opacity-0');
+    mobileMenuPanel.classList.add('translate-x-full');
+    setTimeout(() => {
+      mobileMenu.classList.add('hidden');
+      document.body.style.overflow = '';
+    }, 300);
+  }
+
+  if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', openMobileMenu);
+  if (closeMobileMenuBtn) closeMobileMenuBtn.addEventListener('click', closeMobileMenu);
+  if (mobileMenuBackdrop) mobileMenuBackdrop.addEventListener('click', closeMobileMenu);
+</script>
+
+<script defer src="{{ asset('js/cart.js') }}"></script>
 
   <!-- ☕ REALTIME: Pusher & Laravel Echo -->
   <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>

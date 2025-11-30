@@ -14,11 +14,36 @@ class OrderController extends Controller
     /**
      * Display admin dashboard with all orders
      */
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::with('user')
-            ->latest()
-            ->paginate(20);
+        $query = Order::with('user');
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('customer_name', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%")
+                  ->orWhere('id', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filter by pickup option
+        if ($request->filled('pickup_option')) {
+            $query->where('pickup_option', $request->pickup_option);
+        }
+
+        // Filter by date
+        if ($request->filled('date')) {
+            $query->whereDate('created_at', $request->date);
+        }
+
+        $orders = $query->latest()->paginate(20)->withQueryString();
 
         // Order statistics
         $stats = [
@@ -56,7 +81,34 @@ class OrderController extends Controller
             ->take(5)
             ->get();
 
-        return view('admin.dashboard', compact('orders', 'stats', 'userStats', 'revenueStats', 'recentUsers'));
+        // Chart data: Revenue last 7 days
+        $revenueLast7Days = [];
+        $datesLast7Days = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = now()->subDays($i);
+            $datesLast7Days[] = $date->format('d M');
+            $revenueLast7Days[] = Order::where('status', 'completed')
+                ->whereDate('created_at', $date)
+                ->sum('total_price');
+        }
+
+        $chartData = [
+            'revenue' => [
+                'labels' => $datesLast7Days,
+                'data' => $revenueLast7Days,
+            ],
+            'orders' => [
+                'labels' => ['Pending', 'Preparing', 'Ready', 'Completed'],
+                'data' => [
+                    $stats['pending'],
+                    $stats['preparing'],
+                    $stats['ready'],
+                    $stats['completed'],
+                ],
+            ],
+        ];
+
+        return view('admin.dashboard', compact('orders', 'stats', 'userStats', 'revenueStats', 'recentUsers', 'chartData'));
     }
 
     /**

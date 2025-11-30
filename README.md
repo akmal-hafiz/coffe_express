@@ -1,38 +1,48 @@
-<<<<<<< HEAD
 # Coffee Express ☕
 
-Aplikasi web untuk manajemen pesanan kopi dengan fitur real-time tracking, admin dashboard, dan integrasi Google Maps.
+Aplikasi web untuk coffee shop dengan sistem pemesanan online, tracking pesanan real-time, dan dashboard admin.
 
 ## Fitur Utama
 
-- **User Authentication** - Registrasi dan login user
-- **Menu Management** - Tampilan menu kopi dan non-kopi
-- **Order System** - Sistem pemesanan dengan tracking real-time
-- **Admin Dashboard** - Kelola pesanan dan update status
-- **Real-time Notifications** - Notifikasi live untuk update pesanan
-- **Google Maps Integration** - Lokasi toko dan pengiriman
-- **Responsive Design** - Mobile-friendly interface
+**Untuk Pelanggan:**
+- Lihat menu kopi, makanan, dan minuman
+- Pesan online dengan keranjang belanja
+- Tracking status pesanan secara real-time
+- Riwayat pesanan
+- Program loyalitas dan poin reward
+- Tulis review dan rating
+- Dukungan bahasa Indonesia dan Inggris
 
-## Tech Stack
+**Untuk Admin:**
+- Dashboard dengan statistik penjualan
+- Kelola pesanan dan update status
+- Manajemen menu (tambah, edit, hapus)
+- Kelola promo dan berita
+- Lihat dan balas pesan dari pelanggan
+- Moderasi review pelanggan
+- Laporan penjualan (export Excel/PDF)
 
-- **Backend**: Laravel 12
-- **Frontend**: Blade Templates, Alpine.js, Tailwind CSS
-- **Database**: MySQL / PostgreSQL / SQLite
-- **Real-time**: Pusher Broadcasting
-- **Build Tool**: Vite
+## Teknologi
 
-## Requirements
+- Laravel 12
+- MySQL
+- Tailwind CSS + Alpine.js
+- Pusher (real-time notifications)
+- Google Maps API
 
-- PHP 8.2+
+## Instalasi
+
+### Kebutuhan Sistem
+- PHP 8.2 atau lebih baru
 - Composer
-- Node.js & npm
-- MySQL/PostgreSQL/SQLite
+- Node.js & NPM
+- MySQL atau MariaDB
 
-## Installation
+### Langkah Instalasi
 
-1. Clone repository
+1. Clone repository ini
 ```bash
-git clone https://github.com/username/coffe_express.git
+git clone <url-repository>
 cd coffe_express
 ```
 
@@ -44,40 +54,106 @@ npm install
 
 3. Setup environment
 ```bash
-cp .env.example .env
+copy .env.example .env
 php artisan key:generate
 ```
 
-4. Setup database
+4. Konfigurasi database di file `.env`
+```
+DB_DATABASE=coffe_express
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+5. Buat database dan jalankan migration
 ```bash
 php artisan migrate
 php artisan db:seed
 ```
 
-5. Build assets
+6. Link storage folder
 ```bash
-npm run build
+php artisan storage:link
 ```
 
-6. Start server
+7. Build assets dan jalankan server
+```bash
+npm run dev
+```
+
+Di terminal lain:
 ```bash
 php artisan serve
 ```
 
-Aplikasi akan berjalan di `http://localhost:8000`
+Buka browser: `http://localhost:8000`
 
-## Documentation
+### Akun Default
 
-Lihat folder `docs/` untuk dokumentasi lengkap:
-- `SETUP_GUIDE.md` - Panduan setup awal
-- `MENU_CRUD_DOCUMENTATION.md` - Fitur menu
-- `REALTIME_SETUP.md` - Setup real-time features
-- `GOOGLE_MAPS_INTEGRATION.md` - Integrasi maps
+Setelah seeding, gunakan akun ini untuk login sebagai admin:
+- Email: `admin@example.com`
+- Password: `password`
 
-## License
+## Struktur Database
+
+Aplikasi ini menggunakan beberapa tabel utama:
+- `users` - Data pengguna (customer dan admin)
+- `orders` - Data pesanan
+- `menus` - Daftar menu
+- `promos` - Konten promosi
+- `news` - Artikel berita/blog
+- `contacts` - Pesan dari form kontak
+- `reviews` - Review pelanggan
+- `loyalty_tiers` - Tingkatan loyalitas
+- `loyalty_points` - Poin loyalitas user
+
+## Command Berguna
+
+```bash
+# Clear cache
+php artisan cache:clear
+php artisan config:clear
+
+# Reset database (hati-hati, akan hapus semua data)
+php artisan migrate:fresh --seed
+
+# Build untuk production
+npm run build
+```
+
+## Deployment
+
+Untuk production:
+
+1. Set environment di `.env`
+```
+APP_ENV=production
+APP_DEBUG=false
+```
+
+2. Install dependencies production
+```bash
+composer install --optimize-autoloader --no-dev
+npm run build
+```
+
+3. Set permission yang benar
+```bash
+chmod -R 775 storage bootstrap/cache
+```
+
+## Dokumentasi Lengkap
+
+Lihat folder `docs/` untuk dokumentasi detail tentang:
+- Setup real-time notifications
+- Integrasi Google Maps
+- Manajemen menu
+- Dan lainnya
+
+## Lisensi
 
 MIT License
-=======
-# coffe_express
-Coffee Express - Laravel 12 App
->>>>>>> 886b939cedbccda21463f9c469b585f117c49c30
+
+---
+
+Dibuat dengan ☕ dan ❤️

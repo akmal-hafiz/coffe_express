@@ -6,6 +6,7 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>Admin Dashboard — Coffee Express</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://unpkg.com/feather-icons@4.29.0/dist/feather.min.js"></script>
   <script>
@@ -24,6 +25,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     html,body{font-family:'Poppins',system-ui,Arial,sans-serif}
+
+    /* Fix chart container sizing */
+    .chart-container {
+      position: relative;
+      height: 280px;
+      width: 100%;
+    }
+    .chart-container canvas {
+      max-width: 100%;
+      max-height: 100%;
+    }
   </style>
 </head>
 <body class="bg-cream text-[#2C2C2C]">
@@ -40,10 +52,27 @@
         </div>
       </div>
       <div class="flex items-center gap-4">
-        <a href="{{ route('admin.menus.index') }}" class="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition">
-          <i data-feather="menu" class="w-4 h-4"></i>
-          <span class="hidden sm:inline">Kelola Menu</span>
-        </a>
+        <nav class="hidden md:flex items-center gap-2">
+            <a href="{{ route('admin.dashboard') }}" class="px-3 py-2 rounded-lg bg-white/20 transition">Dashboard</a>
+            <a href="{{ route('admin.menus.index') }}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Menu</a>
+            <a href="{{ route('admin.promos.index') }}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Promos</a>
+            <a href="{{ route('admin.news.index') }}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">News</a>
+            <a href="{{ route('admin.reviews.index') }}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition flex items-center gap-1">
+              <i data-feather="message-square" class="w-4 h-4"></i>
+              Reviews
+            </a>
+            <a href="{{ route('admin.loyalty.index') }}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition flex items-center gap-1">
+              <i data-feather="gift" class="w-4 h-4"></i>
+              Loyalty
+            </a>
+            <a href="{{ route('admin.reports.index') }}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition flex items-center gap-1">
+              <i data-feather="bar-chart-2" class="w-4 h-4"></i>
+              Reports
+            </a>
+        </nav>
+
+        <div class="h-6 w-px bg-white/20 hidden md:block"></div>
+
         <span class="text-sm">{{ Auth::user()->name }}</span>
         <form method="POST" action="{{ route('logout') }}">
           @csrf
@@ -116,6 +145,31 @@
       </div>
     </div>
 
+    <!-- Analytics Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <!-- Revenue Chart -->
+      <div class="bg-white rounded-2xl shadow-lg p-6">
+        <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+          <i data-feather="trending-up" class="w-5 h-5 text-green-600"></i>
+          Revenue Trend (Last 7 Days)
+        </h3>
+        <div class="chart-container">
+          <canvas id="revenueChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Orders Chart -->
+      <div class="bg-white rounded-2xl shadow-lg p-6">
+        <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+          <i data-feather="bar-chart-2" class="w-5 h-5 text-blue-600"></i>
+          Orders by Status
+        </h3>
+        <div class="chart-container">
+          <canvas id="ordersChart"></canvas>
+        </div>
+      </div>
+    </div>
+
     <!-- Order Status Stats -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
       <div class="bg-white rounded-2xl shadow-md p-6 border-l-4 border-gray-400">
@@ -176,6 +230,59 @@
         </div>
       </div>
     @endif
+
+    <!-- Search and Filter -->
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
+      <div class="p-6">
+        <form method="GET" action="{{ route('admin.dashboard') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <!-- Search -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Name, Phone, Order ID..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coffee focus:border-transparent">
+          </div>
+
+          <!-- Status Filter -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+            <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coffee focus:border-transparent">
+              <option value="">All Status</option>
+              <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+              <option value="preparing" {{ request('status') == 'preparing' ? 'selected' : '' }}>Preparing</option>
+              <option value="ready" {{ request('status') == 'ready' ? 'selected' : '' }}>Ready</option>
+              <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
+            </select>
+          </div>
+
+          <!-- Pickup Option Filter -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
+            <select name="pickup_option" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coffee focus:border-transparent">
+              <option value="">All Types</option>
+              <option value="pickup" {{ request('pickup_option') == 'pickup' ? 'selected' : '' }}>Pickup</option>
+              <option value="delivery" {{ request('pickup_option') == 'delivery' ? 'selected' : '' }}>Delivery</option>
+            </select>
+          </div>
+
+          <!-- Date Filter -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+            <input type="date" name="date" value="{{ request('date') }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coffee focus:border-transparent">
+          </div>
+
+          <!-- Buttons -->
+          <div class="md:col-span-4 flex gap-3">
+            <button type="submit" class="px-6 py-2 bg-coffee text-white rounded-lg hover:bg-coffee/90 transition flex items-center gap-2">
+              <i data-feather="search" class="w-4 h-4"></i>
+              Filter
+            </button>
+            <a href="{{ route('admin.dashboard') }}" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition flex items-center gap-2">
+              <i data-feather="x" class="w-4 h-4"></i>
+              Reset
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <!-- Recent Registered Users -->
     <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
@@ -265,7 +372,7 @@
                   <form action="{{ route('admin.orders.updateStatus', $order) }}" method="POST" class="status-form">
                     @csrf
                     @method('PATCH')
-                    <select name="status" onchange="this.form.submit()" 
+                    <select name="status" onchange="this.form.submit()"
                       class="text-xs font-semibold rounded-full px-3 py-1 border-0 cursor-pointer
                       {{ $order->status === 'pending' ? 'bg-gray-100 text-gray-800' : '' }}
                       {{ $order->status === 'preparing' ? 'bg-yellow-100 text-yellow-800' : '' }}
@@ -279,7 +386,7 @@
                   </form>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <button onclick="openTimeModal({{ $order->id }}, {{ $order->estimated_time ?? 0 }})" 
+                  <button onclick="openTimeModal({{ $order->id }}, {{ $order->estimated_time ?? 0 }})"
                     class="text-sm text-coffee hover:text-coffee/80 font-medium flex items-center gap-1">
                     <i data-feather="clock" class="w-4 h-4"></i>
                     {{ $order->estimated_time ? $order->estimated_time . ' min' : 'Set Time' }}
@@ -385,7 +492,7 @@
         e.preventDefault();
         const form = this.closest('form');
         const newStatus = this.value;
-        
+
         Swal.fire({
           title: 'Update Status?',
           text: `Change status to ${newStatus}?`,
@@ -403,6 +510,76 @@
         });
       });
     });
+
+    // Initialize Charts
+    const revenueCtx = document.getElementById('revenueChart');
+    const ordersCtx = document.getElementById('ordersChart');
+
+    // Revenue Chart
+    if (revenueCtx) {
+      new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+          labels: @json($chartData['revenue']['labels']),
+          datasets: [{
+            label: 'Revenue (Rp)',
+            data: @json($chartData['revenue']['data']),
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            tension: 0.4,
+            fill: true,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return 'Rp' + value.toLocaleString('id-ID');
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Orders Chart
+    if (ordersCtx) {
+      new Chart(ordersCtx, {
+        type: 'doughnut',
+        data: {
+          labels: @json($chartData['orders']['labels']),
+          datasets: [{
+            data: @json($chartData['orders']['data']),
+            backgroundColor: [
+              '#9ca3af',
+              '#fbbf24',
+              '#10b981',
+              '#3b82f6'
+            ],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      });
+    }
 
     // Auto refresh every 30 seconds
     setInterval(() => {

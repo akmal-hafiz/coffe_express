@@ -3,64 +3,67 @@
 // - Attaches to any `.add-to-cart` inside product <article data-*>
 // - Floating button + drawer UI with Tailwind
 
-(function(){
+(function () {
   const STORAGE_KEY = 'ce_cart';
   const currency = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 });
 
-  function loadCart(){
+  function loadCart() {
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { return []; }
   }
-  function saveCart(cart){ localStorage.setItem(STORAGE_KEY, JSON.stringify(cart)); }
-  function findIndex(cart, id){ return cart.findIndex(i => i.id === id); }
-  function slugify(s){ return (s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
+  function saveCart(cart) { localStorage.setItem(STORAGE_KEY, JSON.stringify(cart)); }
+  function findIndex(cart, id) { return cart.findIndex(i => i.id === id); }
+  function slugify(s) { return (s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''); }
 
   let cart = loadCart();
 
-  function subtotal(){ return cart.reduce((sum,i)=> sum + i.price * i.qty, 0); }
-  function count(){ return cart.reduce((sum,i)=> sum + i.qty, 0); }
+  function subtotal() { return cart.reduce((sum, i) => sum + i.price * i.qty, 0); }
+  function count() { return cart.reduce((sum, i) => sum + i.qty, 0); }
 
-  function renderBadge(){
-    // Update navbar cart count
+  function renderBadge() {
+    // Update navbar cart count (Desktop)
     const navCount = document.getElementById('cart-count');
-    if(navCount) {
-      const c = count();
+    const bottomCount = document.getElementById('cart-count-bottom');
+    const c = count();
+
+    if (navCount) {
       navCount.textContent = c;
-      if(c > 0) {
-        navCount.style.display = 'flex';
-      } else {
-        navCount.style.display = 'none';
-      }
+      navCount.style.display = c > 0 ? 'flex' : 'none';
+    }
+
+    if (bottomCount) {
+      bottomCount.textContent = c;
+      bottomCount.style.display = c > 0 ? 'flex' : 'none';
     }
   }
 
-  function openDrawer(){
+  function openDrawer() {
     const overlay = document.getElementById('ce-cart-overlay');
     const panel = document.getElementById('ce-cart-panel');
-    if(!overlay || !panel) return;
+    if (!overlay || !panel) return;
     overlay.classList.remove('hidden');
     // allow paint, then slide in
-    requestAnimationFrame(()=>{
+    requestAnimationFrame(() => {
       panel.classList.remove('translate-x-full');
       panel.classList.add('translate-x-0');
     });
   }
-  function closeDrawer(){
+  function closeDrawer() {
     const overlay = document.getElementById('ce-cart-overlay');
     const panel = document.getElementById('ce-cart-panel');
-    if(!overlay || !panel) return;
+    if (!overlay || !panel) return;
     panel.classList.add('translate-x-full');
     panel.classList.remove('translate-x-0');
     // wait for transition then hide overlay
-    setTimeout(()=> overlay.classList.add('hidden'), 300);
+    setTimeout(() => overlay.classList.add('hidden'), 300);
   }
 
-  function renderDrawer(){
+  function renderDrawer() {
     const list = document.getElementById('ce-cart-items');
     const total = document.getElementById('ce-cart-total');
-    if(!list || !total) return;
+    if (!list || !total) return;
 
     list.innerHTML = '';
-    if(cart.length === 0){
+    if (cart.length === 0) {
       list.innerHTML = '<div class="text-center text-gray-500 py-10">Keranjang masih kosong.</div>';
     } else {
       cart.forEach(item => {
@@ -87,31 +90,36 @@
     renderBadge();
   }
 
-  function addItem({name, price, image, category}){
+  function addItem(name, price, image, category = 'general') {
     const id = slugify(name);
     const idx = findIndex(cart, id);
-    if(idx >= 0) cart[idx].qty += 1; else cart.push({ id, name, price, image, category, qty: 1 });
+    if (idx >= 0) cart[idx].qty += 1; else cart.push({ id, name, price, image, category, qty: 1 });
     saveCart(cart);
     renderDrawer();
+    openDrawer(); // Auto open drawer when adding item
   }
 
-  function updateQty(id, delta){
+  // Expose to global scope
+  window.addToCart = addItem;
+
+
+  function updateQty(id, delta) {
     const idx = findIndex(cart, id);
-    if(idx < 0) return;
+    if (idx < 0) return;
     cart[idx].qty += delta;
-    if(cart[idx].qty <= 0) cart.splice(idx,1);
+    if (cart[idx].qty <= 0) cart.splice(idx, 1);
     saveCart(cart);
     renderDrawer();
   }
 
-  function removeItem(id){
+  function removeItem(id) {
     cart = cart.filter(i => i.id !== id);
     saveCart(cart);
     renderDrawer();
   }
 
-  function mountUI(){
-    if(document.getElementById('ce-cart-overlay')) return; // already mounted
+  function mountUI() {
+    if (document.getElementById('ce-cart-overlay')) return; // already mounted
     const wrap = document.createElement('div');
     wrap.innerHTML = `
       <div id=\"ce-cart-overlay\" class=\"fixed inset-0 z-50 hidden\">
@@ -136,58 +144,64 @@
     document.body.appendChild(wrap);
 
     // Event listeners for cart drawer
-    document.getElementById('ce-cart-overlay')?.addEventListener('click', (e)=>{
+    document.getElementById('ce-cart-overlay')?.addEventListener('click', (e) => {
       const t = e.target;
-      if(!(t instanceof HTMLElement)) return;
-      if(t.dataset.close === '1') closeDrawer();
+      if (!(t instanceof HTMLElement)) return;
+      if (t.dataset.close === '1') closeDrawer();
     });
-    document.getElementById('ce-checkout-btn')?.addEventListener('click', ()=>{
+    document.getElementById('ce-checkout-btn')?.addEventListener('click', () => {
       window.location.href = '/checkout';
     });
-    document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeDrawer(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDrawer(); });
   }
 
-  function bindAddToCart(){
+  function bindAddToCart() {
     document.querySelectorAll('.add-to-cart').forEach(btn => {
-      btn.addEventListener('click', (e)=>{
+      btn.addEventListener('click', (e) => {
         e.preventDefault();
         const article = btn.closest('article');
-        if(!article) return;
+        if (!article) return;
         const name = article.getAttribute('data-name') || article.querySelector('h3')?.textContent?.trim();
         const price = Number(article.getAttribute('data-price') || '0');
         const category = article.getAttribute('data-category') || 'other';
         const imgEl = article.querySelector('img');
         const image = imgEl ? imgEl.getAttribute('src') : '';
-        if(!name || !price){ return; }
+        if (!name || !price) { return; }
         addItem({ name, price, image, category });
         openDrawer();
       });
     });
   }
 
-  function bindDrawerActions(){
-    document.getElementById('ce-cart-overlay')?.addEventListener('click', (e)=>{
+  function bindDrawerActions() {
+    document.getElementById('ce-cart-overlay')?.addEventListener('click', (e) => {
       const t = e.target;
-      if(!(t instanceof HTMLElement)) return;
+      if (!(t instanceof HTMLElement)) return;
       const act = t.getAttribute('data-act');
       const id = t.getAttribute('data-id');
-      if(!act || !id) return;
-      if(act === 'inc') updateQty(id, +1);
-      if(act === 'dec') updateQty(id, -1);
-      if(act === 'remove') removeItem(id);
+      if (!act || !id) return;
+      if (act === 'inc') updateQty(id, +1);
+      if (act === 'dec') updateQty(id, -1);
+      if (act === 'remove') removeItem(id);
     });
   }
 
-  document.addEventListener('DOMContentLoaded', function(){
+  document.addEventListener('DOMContentLoaded', function () {
     mountUI();
     bindAddToCart();
     bindDrawerActions();
     renderDrawer();
-    
+
     // Bind navbar cart icon
     const cartIcon = document.getElementById('cart-icon');
-    if(cartIcon) {
+    if (cartIcon) {
       cartIcon.addEventListener('click', openDrawer);
+    }
+
+    // Bind bottom nav cart icon
+    const bottomCartIcon = document.getElementById('cart-icon-bottom');
+    if (bottomCartIcon) {
+      bottomCartIcon.addEventListener('click', openDrawer);
     }
   });
 })();

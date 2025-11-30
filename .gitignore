@@ -1,3 +1,4 @@
+# Laravel
 *.log
 .DS_Store
 .env
@@ -5,20 +6,51 @@
 .env.production
 .phpactor.json
 .phpunit.result.cache
+Homestead.json
+Homestead.yaml
+Thumbs.db
+auth.json
+
+# IDE
 /.fleet
 /.idea
 /.nova
 /.phpunit.cache
 /.vscode
 /.zed
-/auth.json
+
+# Dependencies
 /node_modules
+/vendor
+
+# Build files
 /public/build
 /public/hot
 /public/storage
+
+# Storage
 /storage/*.key
 /storage/pail
-/vendor
-Homestead.json
-Homestead.yaml
+
+# Database backups
+*.sql
+*.sqlite
+*.db
+database_backup*.sql
+backup_*.sql
+
+# Environment backups
+.env.*.backup*
+
+# Temporary files
+*.tmp
+*.bak
+*.backup
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
 Thumbs.db
+desktop.ini
