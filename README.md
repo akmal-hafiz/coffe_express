@@ -156,4 +156,3 @@ MIT License
 
 ---
 
-Dibuat dengan ☕ dan ❤️
